@@ -59,7 +59,14 @@ class Command(Process):
         out = ''
         err = ''
         try:
-            sp = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True, cwd=self.cwd)
+            
+            sp = subprocess.Popen(command,\
+                                  stdin=subprocess.PIPE,\
+                                  stdout=subprocess.PIPE,\
+                                  stderr=subprocess.PIPE,\
+                                  universal_newlines=True,\
+                                  cwd=self.cwd,\
+                                  shell=pyven.constants.PLATFORM == pyven.constants.PLATFORMS[1])
             out, err = sp.communicate(input='\n')
             returncode = sp.returncode
         except FileNotFoundError as e:
