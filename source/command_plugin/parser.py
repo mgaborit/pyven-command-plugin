@@ -1,5 +1,5 @@
 from pyven.exceptions.parser_exception import ParserException
-from pyven.plugin_api.parser import Parser
+from pyven.plugins.plugin_api.parser import Parser
 
 from command_plugin.command import Command
 

@@ -1,9 +1,7 @@
-from pyven.exceptions.exception import PyvenException
-
 import os, subprocess, time
 import pyven.constants
 
-from pyven.plugin_api.process import Process
+from pyven.plugins.plugin_api.process import Process
 
 from pyven.logging.logger import Logger
 
