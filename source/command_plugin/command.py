@@ -1,3 +1,5 @@
+from pyven.exceptions.exception import PyvenException
+
 import os, subprocess, time
 import pyven.constants
 
@@ -32,7 +34,7 @@ class Command(Process):
         
         if returncode != 0:
             self.status = pyven.constants.STATUS[1]
-            self.errors = out.splitlines() + err.splitlines()
+            self.errors.extend([out.splitlines() + err.splitlines()])
             Logger.get().error('Command failed : ' + self.type + ':' + self.name)
         else:
             self.status = pyven.constants.STATUS[0]
@@ -56,10 +58,17 @@ class Command(Process):
         
     def _call_command(self, command):
         tic = time.time()
-        sp = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True, cwd=self.cwd)
-        out, err = sp.communicate(input='\n')
+        out = ''
+        err = ''
+        try:
+            sp = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True, cwd=self.cwd)
+            out, err = sp.communicate(input='\n')
+            returncode = sp.returncode
+        except FileNotFoundError as e:
+            returncode = 1
+            self.errors.append(['Unknown command'])
         toc = time.time()
-        return round(toc - tic, 3), out, err, sp.returncode
+        return round(toc - tic, 3), out, err, returncode
         
     def _format_call(self):
         call = self.command.split(' ')

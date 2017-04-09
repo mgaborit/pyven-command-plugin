@@ -4,6 +4,8 @@ from pyven.plugin_api.parser import Parser
 from command_plugin.command import Command
 
 class CommandParser(Parser):
+    COUNT = 0
+    SINGLETON = None
     
     def __init__(self, cwd):
         super(CommandParser, self).__init__(cwd)
@@ -28,4 +30,8 @@ class CommandParser(Parser):
         objects.append(Command(self.cwd, members[0], command, directory))
         return objects
         
-        
+def get(cwd):
+    if CommandParser.COUNT <= 0:
+        CommandParser.SINGLETON = CommandParser(cwd)
+    CommandParser.SINGLETON.cwd = cwd
+    return CommandParser.SINGLETON
