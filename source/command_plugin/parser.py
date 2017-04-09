@@ -8,6 +8,7 @@ class CommandParser(Parser):
     SINGLETON = None
     
     def __init__(self, cwd):
+        CommandParser.COUNT += 1
         super(CommandParser, self).__init__(cwd)
     
     def parse(self, node):
@@ -31,7 +32,7 @@ class CommandParser(Parser):
         return objects
         
 def get(cwd):
-    if CommandParser.COUNT <= 0:
+    if CommandParser.COUNT <= 0 or CommandParser.SINGLETON is None:
         CommandParser.SINGLETON = CommandParser(cwd)
     CommandParser.SINGLETON.cwd = cwd
     return CommandParser.SINGLETON
