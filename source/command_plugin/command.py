@@ -16,6 +16,7 @@ class Command(Process):
         if self.directory != '.':
             self.cwd = os.path.join(self.cwd, self.directory)
     
+    @Process.error_checks
     def process(self, verbose=False, warning_as_error=False):
         Logger.get().info('Command : ' + self.type + ':' + self.name)
         if not os.path.isdir(self.directory):
@@ -38,7 +39,9 @@ class Command(Process):
             self.status = pyven.constants.STATUS[0]
         return returncode == 0
     
-    def clean(self, verbose=False):
+    @Process.error_checks
+    def clean(self, verbose=False, warning_as_error=False):
+        self.status = pyven.constants.STATUS[0]
         return True
         
     def report_summary(self):
