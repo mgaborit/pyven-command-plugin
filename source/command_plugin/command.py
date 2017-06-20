@@ -26,14 +26,14 @@ class Command(Process):
         Logger.get().info('Leaving directory : ' + self.directory)
         
         if verbose:
-            for line in out.splitlines():
+            for line in out:
                 Logger.get().info('[' + self.type + ']' + line)
-            for line in err.splitlines():
+            for line in err:
                 Logger.get().info('[' + self.type + ']' + line)
         
         if returncode != 0:
             self.status = pyven.constants.STATUS[1]
-            self.errors.extend([out.splitlines() + err.splitlines()])
+            self.errors.extend([out + err])
             Logger.get().error('Command failed : ' + self.type + ':' + self.name)
         else:
             self.status = pyven.constants.STATUS[0]
@@ -62,16 +62,29 @@ class Command(Process):
         out = ''
         err = ''
         try:
-            
-            sp = subprocess.Popen(command,\
-                                  stdin=subprocess.PIPE,\
-                                  stdout=subprocess.PIPE,\
-                                  stderr=subprocess.PIPE,\
-                                  universal_newlines=True,\
-                                  cwd=self.cwd,\
-                                  shell=pyven.constants.PLATFORM == pyven.constants.PLATFORMS[1])
-            out, err = sp.communicate(input='\n')
-            returncode = sp.returncode
+            try:
+                sp = subprocess.Popen(command,\
+                                      stdin=subprocess.PIPE,\
+                                      stdout=subprocess.PIPE,\
+                                      stderr=subprocess.PIPE,\
+                                      universal_newlines=True,\
+                                      cwd=self.cwd,\
+                                      shell=pyven.constants.PLATFORM == pyven.constants.PLATFORMS[1])
+                out, err = sp.communicate(input='\n')
+                out = out.splitlines()
+                err = err.splitlines()
+                returncode = sp.returncode
+            except UnicodeDecodeError as e:
+                sp = subprocess.Popen(command,\
+                                      stdin=subprocess.PIPE,\
+                                      stdout=subprocess.PIPE,\
+                                      stderr=subprocess.PIPE,\
+                                      cwd=self.cwd,\
+                                      shell=pyven.constants.PLATFORM == pyven.constants.PLATFORMS[1])
+                out, err = sp.communicate()
+                out = out.decode("cp1252").split('\n')
+                err = err.decode("cp1252").split('\n')
+                returncode = sp.returncode
         except FileNotFoundError as e:
             returncode = 1
             self.errors.append(['Unknown command'])
